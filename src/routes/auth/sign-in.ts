@@ -19,8 +19,6 @@ export async function signIn(app: FastifyInstance) {
   async (request) => {
     const { phone, password } = request.body
 
-    console.log(phone, password)
-
     const user = await db.user.findUnique({
       where: {
         phone,
