@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum PilotRank {
+  PROBATIONARY_PILOT
+  PILOT
+  EXPERIENCED_PILOT
+  SENIOR_PILOT
+  VETERAN_PILOT
+  SUB_COMMAND
+  COMMAND
+}
+
+model User {
+  id           String       @id @default(uuid())
+  fullName     String
+  phone        String       @unique
+  internalRole PilotRank    @default(PROBATIONARY_PILOT)
+  password     String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  reports      UserReport[]
+}
+
+model Report {
+  id           String   @id @default(uuid())
+  reportNumber Int      @unique
+  title        String
+  description  String   @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  users        UserReport[]
+}
+
+model UserReport {
+  userId   String
+  reportId String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@id([userId, reportId])
+}
+
